@@ -2,6 +2,10 @@ q# Python bytecode:
 *.py[co]
 production.py
 
+# cache:
+__pycache__/
+*.pyc
+
 # Packaging files:
 *.egg*
 
