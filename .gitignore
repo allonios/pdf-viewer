@@ -1,4 +1,4 @@
-q# Python bytecode:
+# Python bytecode:
 *.py[co]
 production.py
 
