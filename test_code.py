@@ -93,7 +93,9 @@ class BackGroundColorEditor():
                 (3, 3)
             )
         )
+        cv2.imshow("mask1", mask)
         mask = cv2.bitwise_not(mask)
+        cv2.imshow("mask2", mask)
 
         background = np.full(self.image.shape, rgb_color, np.uint8)
 
@@ -108,9 +110,9 @@ class BackGroundColorEditor():
         return final
 
 
-image = cv2.imread("test_files/test_image.jpg")
+# image = cv2.imread("test_files/test_image.jpg")
 
-images = convert_from_path("test_files/resume.pdf")
+images = convert_from_path("test_files/part-4.pdf")
 
 images = list(
     map(
@@ -131,7 +133,7 @@ images = list(
 # cv2.waitKey()
 
 bg = BackGroundColorEditor(images[0])
-new_image = bg.set_background_color((255, 255, 0))
+new_image = bg.set_background_color((125, 222, 0))
 
 cv2.imshow("Original Image", images[0])
 cv2.imshow("New Image", new_image)

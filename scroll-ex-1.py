@@ -89,7 +89,8 @@ class PanState(object):
 
 if __name__ == "__main__":
     images = convert_from_path(
-        "test_files/resume.pdf", poppler_path=f"C://Users//LENOVO//Downloads//poppler-21.11.0//Library//bin")
+        "test_files/resume.pdf",
+    )
 
     images = list(
         map(
