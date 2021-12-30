@@ -24,7 +24,6 @@ class WarmingEffect():
         spline_interpolate = UnivariateSpline(x, y)
         return spline_interpolate(range(256))
 
-
     def increase_saturation(self, image):
         hue_channel, saturation_channel, value_channel = cv2.split(
             cv2.cvtColor(
@@ -38,7 +37,6 @@ class WarmingEffect():
             self.increase_channel_lut_red
         ).astype(np.uint8)
 
-
         return cv2.cvtColor(
             cv2.merge(
                 (
@@ -49,7 +47,6 @@ class WarmingEffect():
             ),
             cv2.COLOR_HSV2RGB
         )
-
 
     def render_image(self, apply_increase_saturation=True):
         red_channel, green_channel, blue_channel = cv2.split(self.image)
@@ -110,7 +107,8 @@ class BackGroundColorEditor():
 
 image = cv2.imread("test_files/test_image.jpg")
 
-images = convert_from_path("test_files/resume.pdf")
+images = convert_from_path(
+    "test_files/resume.pdf", poppler_path=f"C://Users//LENOVO//Downloads//poppler-21.11.0//Library//bin")
 
 images = list(
     map(
@@ -120,21 +118,22 @@ images = list(
 )
 
 
-# w_e = WarmingEffect(images[0])
-# # w_e = WarmingEffect(image)
-# warm_image = w_e.render_image()
-#
-# cv2.imshow("Original Image", images[0])
-# # cv2.imshow("Original Image", image)
-# cv2.imshow("New Image", warm_image)
-#
-# cv2.waitKey()
-
-bg = BackGroundColorEditor(images[0])
-new_image = bg.set_background_color((255, 255, 0))
+w_e = WarmingEffect(images[0])
+# w_e = WarmingEffect(image)
+warm_image = w_e.render_image()
 
 cv2.imshow("Original Image", images[0])
-cv2.imshow("New Image", new_image)
+# cv2.imshow("Original Image", image)
+# cv2.namedWindow('New Image', cv2.WINDOW_NORMAL)
+cv2.imshow("New Image", warm_image)
 
 cv2.waitKey()
+
+# bg = BackGroundColorEditor(images[0])
+# new_image = bg.set_background_color((255, 255, 0))
+
+# cv2.imshow("Original Image", images[0])
+# cv2.imshow("New Image", new_image)
+
+# cv2.waitKey()
 #
