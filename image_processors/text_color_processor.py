@@ -21,7 +21,7 @@ class TextColorProcessor(BaseProcessor):
         self.text_color = text_color
 
     @jit
-    def detect_text(self):
+    def change_text_color(self):
         text_mask_5 = create_text_mask(self.image)
         text_mask_15 = create_text_mask(self.image, disk_radius=15)
 
@@ -56,4 +56,4 @@ class TextColorProcessor(BaseProcessor):
 
     def process_image(self, image=None):
         self.image = super().process_image(image)
-        return self.detect_text()
+        return self.change_text_color()

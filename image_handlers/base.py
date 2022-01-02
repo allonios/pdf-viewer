@@ -29,3 +29,4 @@ class BaseImageHandler:
         self.run_processors()
         cv2.imshow("Result", self.current_image)
         cv2.waitKey()
+        return self.current_image

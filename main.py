@@ -6,6 +6,7 @@ from image_handlers.base import BaseImageHandler
 from image_processors.CallbackProcessor import CallbackProcessor
 from image_processors.background_color_processor import \
     BackgroundColorProcessor
+from image_processors.eye_comfort_processor import EyeComfort
 from image_processors.text_color_processor import TextColorProcessor
 
 images = convert_from_path("test_files/test.pdf")
@@ -20,10 +21,9 @@ images = list(
 image = images[2]
 
 processors = [
-    # EyeComfort(),
-    BackgroundColorProcessor(
-        ((0, 222, 125))
-    ),
+    # BackgroundColorProcessor(
+    #     ((0, 222, 125))
+    # ),
     # CallbackProcessor(
     #     lambda image: cv2.resize(
     #         image,
@@ -34,6 +34,7 @@ processors = [
     #     )
     # ),
     # TextColorProcessor()
+    EyeComfort(),
 ]
 
 handler = BaseImageHandler(

@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from numba import jit
 from pyciede2000 import ciede2000
 from scipy.interpolate import UnivariateSpline
 from skimage.morphology import disk
@@ -10,6 +11,7 @@ def get_lut(x, y):
     return spline_interpolate(range(256))
 
 
+@jit
 def create_text_mask(image, disk_radius=5):
     _, binary_image = cv2.threshold(
         cv2.cvtColor(image, cv2.COLOR_BGR2GRAY),
