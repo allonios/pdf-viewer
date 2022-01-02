@@ -1,18 +1,19 @@
+import warnings
+
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
+from numba import NumbaDeprecationWarning, NumbaWarning
 from numba import jit
-from scipy.spatial.distance import euclidean
 
 from image_processors.base import BaseProcessor
-from skimage.morphology import disk
-
 from utils.utils import (
     apply_mask,
     create_text_mask,
     get_most_none_background_frequent_color, get_color_difference
 )
 
+warnings.simplefilter("ignore", category=NumbaDeprecationWarning)
+warnings.simplefilter("ignore", category=NumbaWarning)
 
 class TextColorProcessor(BaseProcessor):
 
@@ -49,8 +50,6 @@ class TextColorProcessor(BaseProcessor):
                     color_mask[i, j] = np.array([0, 0, 0])
 
         color_mask = color_mask.astype("uint8")
-
-        cv2.imshow("color_mask", color_mask)
 
         return apply_mask(color_mask, self.image, text_mask)
 

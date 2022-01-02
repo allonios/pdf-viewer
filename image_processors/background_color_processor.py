@@ -1,10 +1,16 @@
+import warnings
+
 import cv2
 import numpy as np
+from numba import NumbaDeprecationWarning, NumbaWarning
 from numba import jit
 
 from image_processors.base import BaseProcessor
-from utils.utils import get_most_frequent_color
+from utils.utils import get_most_frequent_color, get_mask_from_color, \
+    get_text_cleaned_background_mask, create_text_mask
 
+warnings.simplefilter("ignore", category=NumbaDeprecationWarning)
+warnings.simplefilter("ignore", category=NumbaWarning)
 
 class BackgroundColorProcessor(BaseProcessor):
     def __init__(self, background_color, image=None):
@@ -14,7 +20,6 @@ class BackgroundColorProcessor(BaseProcessor):
     @jit
     def set_background_color(self):
         background_color = get_most_frequent_color(self.image)
-        print(background_color)
 
         new_image = self.image.copy()
         new_image[

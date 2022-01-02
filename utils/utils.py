@@ -165,3 +165,20 @@ def get_color_difference(color1, color2):
     lab2 = rgb2lab(color2)
 
     return ciede2000(tuple(lab1), tuple(lab2))["delta_E_00"]
+
+
+def get_mask_from_color(image, existing_color, new_color):
+    return np.apply_along_axis(
+        lambda pixel: 255 if all(
+            np.equal(pixel, existing_color)
+        ) else 0,
+        2,
+        image
+    ).astype("uint8")
+
+def get_text_cleaned_background_mask(background_mask, text_mask):
+    return cv2.bitwise_and(
+        background_mask,
+        background_mask,
+        mask=cv2.bitwise_not(text_mask)
+    )
