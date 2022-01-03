@@ -17,6 +17,7 @@ import numpy as np
 from pdf2image import convert_from_path
 from screeninfo import get_monitors
 
+from IrisDetetion02 import detect_eye
 from image_handlers.base import BaseImageHandler
 from image_processors.background_color_processor import (
     BackgroundColorProcessor
@@ -328,7 +329,16 @@ class SettingsView():
             settings=settings
         )
 
-        cv2.waitKey()
+        key = -1
+
+        while (
+                key != ord("q")
+                and key != 27
+                and cv2.getWindowProperty(window.WINDOW_NAME, 0) >= 0
+        ):
+            detect_eye(window)
+            key = cv2.waitKey(5)  # User can press 'q' or ESC to exit.
+        cv2.destroyAllWindows()
 
     def save(self):
         with open("run_settings.json", "w") as file:

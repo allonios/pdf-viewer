@@ -161,7 +161,7 @@ def detect_eye(window):
 
         if wink_detection_buffer.check_wink():
             shot = screenshot()
-            shot.save(r"/home/bilalx/Pictures/screenshot.jpg")
+            shot.save(r"screenshot.jpg")
         face_tracked=sorted(area,key=lambda x:x[1],reverse=True)[0][0]
         face_gray=gray[face_tracked[1]:face_tracked[1]+face_tracked[3],face_tracked[0]:face_tracked[0]+face_tracked[2]]
         eyes = eyeCascade.detectMultiScale(
