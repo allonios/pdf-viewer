@@ -7,7 +7,7 @@ import enum
 import json
 from copy import deepcopy
 import evdev
-from IrisDetect import detect_eye
+from IrisDetetion02 import detect_eye
 
 
 class UserActivityMode(enum.Enum):

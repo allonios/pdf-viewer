@@ -88,7 +88,7 @@ class EyeTrackingBuffer(Buffer):
         #     print("strait")
 
 eye_tracking_buffers = [EyeTrackingBuffer(5), EyeTrackingBuffer(5)]
-wink_detection_buffer = WinkDetectionBuffer(3)
+wink_detection_buffer = WinkDetectionBuffer(10)
 
 def which_eye(eye_x, eye_w, face_w):
     if eye_x + 0.5 * eye_w > (face_w / 2):
