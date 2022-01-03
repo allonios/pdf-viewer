@@ -28,5 +28,5 @@ class BaseImageHandler:
         # cv2.imshow("Original Image", self.current_image)
         self.run_processors()
         cv2.imshow("Result", self.current_image)
-        # cv2.waitKey()
+        cv2.waitKey()
         return self.current_image

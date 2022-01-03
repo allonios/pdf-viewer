@@ -11,6 +11,8 @@ from tkinter import (
 from tkinter.filedialog import askopenfilename
 
 import cv2
+import os
+import json
 import numpy as np
 from pdf2image import convert_from_path
 
@@ -23,7 +25,8 @@ from image_processors.eye_comfort_processor import EyeComfort
 from image_processors.text_color_processor import TextColorProcessor
 
 
-cv2.namedWindow("background_color", cv2.WINDOW_NORMAL)
+cv2.namedWindow("Result", cv2.WINDOW_NORMAL)
+# cv2.namedWindow("Result1", cv2.WINDOW_NORMAL)
 
 class PDFViewer():
     def __init_tools_frame(self, frame_parent):
@@ -32,6 +35,11 @@ class PDFViewer():
 
 
     def __init__(self):
+        with open("run_settings.json", "r") as file:
+            self.global_settings = json.loads(
+                file.read()
+            )
+
         self.file_dir = ""
 
         self.window = Tk()
@@ -74,11 +82,16 @@ class PDFViewer():
             )
         )
         self.window.destroy()
-        self.settings_view = SettingsView(self.images)
+
+        self.settings_view = SettingsView(
+            self.images,
+            os.path.basename(self.file_dir),
+            self.global_settings
+        )
 
 
 class SettingsView():
-    def __init__(self, images):
+    def __init__(self, images, file_name, settings=None):
         self.images = images
         self.images_numbers_labels = list(
             map(
@@ -86,27 +99,24 @@ class SettingsView():
                 range(len(images))
             )
         )
-        # self.settings = []
-        self.settings = [
-            # {
-            #     'page_number': 2,
-            #     'eye_comfort': True,
-            #     'text_color': ['0', ' 222', ' 125'],
-            #     'background_color': []
-            # },
-            {
-                'page_number': 0,
-                'eye_comfort': False,
-                'text_color': [],
-                'background_color': ['0', ' 222', ' 125']
-            }
-        ]
+        self.images_shape = images[0].shape
+
+        self.file_name = file_name
+
+        self.settings = {}
+        if settings:
+            self.settings = settings
+
+        if not self.settings.get(file_name, False):
+            self.settings[file_name] = []
+
+        print(self.settings)
 
 
         # init window
         self.window = Tk()
         self.window.title("PDF Viewer")
-        self.window.geometry("500x500")
+        self.window.geometry("500x550")
 
 
         # styles
@@ -165,17 +175,26 @@ class SettingsView():
             text="Add",
             command=self.add_settings_element
         )
+
         self.clear_button = Button(
             self.window,
             width=25,
             text="Clear",
             command=self.clear_settings
         )
+
         self.show_button = Button(
             self.window,
             width=25,
             text="Show",
             command=self.show
+        )
+
+        self.save_button = Button(
+            self.window,
+            width=25,
+            text="Save",
+            command=self.save
         )
 
         # pack gui elements
@@ -189,6 +208,7 @@ class SettingsView():
         self.add_button.pack(padx=10, pady=10)
         self.clear_button.pack(padx=10, pady=10)
         self.show_button.pack(padx=10, pady=10)
+        self.save_button.pack(padx=10, pady=10)
 
         self.window.mainloop()
 
@@ -203,7 +223,7 @@ class SettingsView():
         if self.background_color_entry.get():
             background_color = self.background_color_entry.get().split(",")
 
-        self.settings.append(
+        self.settings[self.file_name].append(
             {
                 "page_number": page_number,
                 "eye_comfort": eye_comfort,
@@ -214,7 +234,7 @@ class SettingsView():
         print(self.settings)
 
     def clear_settings(self):
-        self.settings.clear()
+        self.settings[self.file_name].clear()
 
     def get_image_handler(self, settings_element):
         processors = []
@@ -233,12 +253,22 @@ class SettingsView():
                         None,
                         fx=1.5,
                         fy=1.5,
-                        interpolation=cv2.INTER_NEAREST
+                        interpolation=cv2.INTER_LANCZOS4
                     )
                 ),
             )
             processors.append(
                 TextColorProcessor(settings_element["text_color"])
+            )
+            processors.append(
+                CallbackProcessor(
+                    lambda image: cv2.resize(
+                        image,
+                        # None,
+                        (self.images_shape[1], self.images_shape[0]),
+                        interpolation=cv2.INTER_LANCZOS4
+                    )
+                ),
             )
 
         if settings_element["eye_comfort"]:
@@ -247,7 +277,8 @@ class SettingsView():
         return BaseImageHandler(
             processors=processors,
             init_image=self.images[settings_element["page_number"]],
-            registered_windows_names=[str(settings_element["page_number"])]
+            # registered_windows_names=[str(settings_element["page_number"])]
+            registered_windows_names=[]
         )
 
     def show(self):
@@ -255,7 +286,7 @@ class SettingsView():
         images_to_edit_indexes = set(
             map(
                 lambda settings_element: settings_element["page_number"],
-                self.settings
+                self.settings[self.file_name]
             )
         )
 
@@ -268,18 +299,23 @@ class SettingsView():
                                     settings_element[
                                         "page_number"] == image_index
                             ),
-                            self.settings
+                            self.settings[self.file_name]
                         )
                     )[0]
                 )
                 show_images.append(handler.run())
-            else:
-                show_images.append(image)
+            # else:
+            #     show_images.append(image)
 
-        for image_index, image in enumerate(show_images):
-            cv2.imshow(str(image_index), image)
+        # for image_index, image in enumerate(show_images):
+        #     cv2.imshow(str(image_index), image)
 
-        cv2.waitKey()
+        # cv2.waitKey()
+
+    def save(self):
+        with open("run_settings.json", "w") as file:
+            file.write(json.dumps(self.settings, indent=4))
 
 
-pdf = PDFViewer()
+if __name__ == "__main__":
+    pdf = PDFViewer()

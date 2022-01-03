@@ -1,0 +1,15 @@
+{
+    "test.pdf": [
+        {
+            "page_number": 2,
+            "eye_comfort": false,
+            "text_color": [
+                0,
+                222,
+                125
+            ],
+            "background_color": [
+            ]
+        }
+    ]
+}

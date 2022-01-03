@@ -7,10 +7,13 @@ from numba import jit
 
 from image_processors.base import BaseProcessor
 from utils.utils import (
-    apply_mask,
+    pixel_editor,
     create_text_mask,
-    get_most_none_background_frequent_color, get_color_difference
+    get_most_none_background_frequent_color, get_color_difference,
+    pixel_editor, apply_mask
 )
+
+
 
 warnings.simplefilter("ignore", category=NumbaDeprecationWarning)
 warnings.simplefilter("ignore", category=NumbaWarning)
@@ -19,7 +22,7 @@ class TextColorProcessor(BaseProcessor):
 
     def __init__(self, text_color=(0, 222, 125), image=None):
         super().__init__(image)
-        self.text_color = text_color
+        self.text_color = pixel_editor.text_color = text_color
 
     @jit
     def change_text_color(self):
@@ -28,9 +31,19 @@ class TextColorProcessor(BaseProcessor):
 
         text_mask = cv2.bitwise_or(text_mask_5, text_mask_15)
 
+        # pixel_editor.main_font_color, color_mask = get_most_none_background_frequent_color(
+        #     self.image, text_mask
+        # )
         main_font_color, color_mask = get_most_none_background_frequent_color(
             self.image, text_mask
         )
+
+        # test_image = np.apply_along_axis(
+        #     pixel_editor.edit_pixel,
+        #     2,
+        #     color_mask
+        # ).astype("uint8")
+        # cv2.imshow("Result1", test_image)
 
         height, width, _ = color_mask.shape
 
@@ -38,8 +51,11 @@ class TextColorProcessor(BaseProcessor):
             for j in range(width):
                 pixel = color_mask[i, j]
                 if not (
-                        ((pixel[0] == -1) or (pixel[1] == -1) or (
-                                pixel[2] == -1))
+                        (
+                            (pixel[0] == -1)
+                            or (pixel[1] == -1)
+                            or (pixel[2] == -1)
+                        )
                 ):
                     if get_color_difference(
                         color_mask[i, j],

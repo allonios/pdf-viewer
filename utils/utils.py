@@ -182,3 +182,29 @@ def get_text_cleaned_background_mask(background_mask, text_mask):
         background_mask,
         mask=cv2.bitwise_not(text_mask)
     )
+
+class PixelEditor():
+    def __init__(self):
+        self.main_font_color = []
+        self.text_color = 0
+
+    @jit
+    def edit_pixel(self, pixel):
+        if not (
+                ((pixel[0] == -1) or (pixel[1] == -1) or (
+                        pixel[2] == -1))
+        ):
+            if get_color_difference(
+                    pixel,
+                    self.main_font_color
+            ) < 37:
+                return self.text_color
+            else:
+                return pixel
+        elif ((pixel[0] == -1) or (pixel[1] == -1) or (pixel[2] == -1)):
+            return np.array([0, 0, 0])
+        else:
+            return pixel
+
+pixel_editor = PixelEditor()
+
