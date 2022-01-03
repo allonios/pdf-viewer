@@ -6,7 +6,8 @@ from screeninfo import get_monitors
 import enum
 import json
 from copy import deepcopy
-from IrisDetect import detect_eye
+import evdev
+from IrisDetetion02 import detect_eye
 
 
 class UserActivityMode(enum.Enum):

@@ -2,6 +2,7 @@ from typing import get_args
 import cv2
 import sys
 import numpy as np
+from pyautogui import screenshot
 
 # TO DO: Make this a function. Make main.py after pdf gets sorted out, then send frame to this function and return eye coordinates.
 eyeCascade = cv2.CascadeClassifier('./haarcascade_eye_2.xml')
@@ -103,6 +104,7 @@ class EyeTrackingBuffer(Buffer):
         
 
 buffers = [EyeTrackingBuffer(10), EyeTrackingBuffer(10)]
+wink_detection_buffer = WinkDetectionBuffer(5)
 
 def which_eye(eye_x, eye_w, face_w):
     if eye_x + 0.5 * eye_w > (face_w / 2):
@@ -112,7 +114,9 @@ def which_eye(eye_x, eye_w, face_w):
         print("left")
         return 1
 
-while True:
+
+
+def detect_eye(window):
     # Capture frame-by-frame
     ret, frame = video_capture.read()
 
@@ -136,7 +140,8 @@ while True:
         cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
         # cv2.rectangle(frame, (0,y_wind-1100), (200,y_wind-900), (0, 255, 0), 2)
         #f2=frame[y:y+h,x:x+w]
-
+    left_eye_detected = False
+    right_eye_detected = False
     if area:
         result0 = buffers[0].check_orientation()
         result1 = buffers[1].check_orientation()
@@ -154,7 +159,9 @@ while True:
         # else:
         #     print("1 => STRAIT")
 
-
+        if wink_detection_buffer.check_wink():
+            shot = screenshot()
+            shot.save(r"/home/bilalx/Pictures/screenshot.jpg")
         face_tracked=sorted(area,key=lambda x:x[1],reverse=True)[0][0]
         face_gray=gray[face_tracked[1]:face_tracked[1]+face_tracked[3],face_tracked[0]:face_tracked[0]+face_tracked[2]]
         eyes = eyeCascade.detectMultiScale(
@@ -163,8 +170,16 @@ while True:
             minNeighbors=5,
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE)
+       
         for (x, y, w, h) in eyes:
             eye_index = which_eye(x, w, face_tracked[2])
+            if eye_index == 0:
+                print("left")
+                left_eye_detected = True
+            if eye_index == 1:
+                print("right")
+                right_eye_detected = True
+
             eye_center_according_to_face = face_tracked[3] / int(y + (0.5 * h))  # Center coordinates
             print("eye_index: ", eye_index, )
             print("eye_center_according_to_face: ", eye_center_according_to_face)
@@ -174,8 +189,6 @@ while True:
                 print("UP")
             
             buffers[eye_index].append(eye_center_according_to_face)
-
-
 
             xe=x+w/2
             ye=y+h/2
@@ -188,14 +201,11 @@ while True:
         yf=face_tracked[1]+face_tracked[3]/3
         #print xf,yf
     # Display the resulting frame
+    if right_eye_detected or left_eye_detected:
+        print(wink_detection_buffer.buffer_list)
+        wink_detection_buffer.append((right_eye_detected, left_eye_detected))
     cv2.imshow('frame', frame)
     #f3=frame[fc[0]:fc[0]+fc[2],fc[1]:fc[1]+fc[3]]
     #cv2.namedWindow('frame2', cv2.WINDOW_NORMAL)
     #cv2.imshow('frame2', f3)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# When everything is done, release the capture
-video_capture.release()
-cv2.destroyAllWindows
