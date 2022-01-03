@@ -6,7 +6,6 @@ from screeninfo import get_monitors
 import enum
 import json
 from copy import deepcopy
-import evdev
 from IrisDetect import detect_eye
 
 

@@ -15,6 +15,7 @@ import os
 import json
 import numpy as np
 from pdf2image import convert_from_path
+from screeninfo import get_monitors
 
 from image_handlers.base import BaseImageHandler
 from image_processors.background_color_processor import (
@@ -23,7 +24,7 @@ from image_processors.background_color_processor import (
 from image_processors.callback_processor import CallbackProcessor
 from image_processors.eye_comfort_processor import EyeComfort
 from image_processors.text_color_processor import TextColorProcessor
-
+from scroll import Viewer
 
 cv2.namedWindow("Result", cv2.WINDOW_NORMAL)
 # cv2.namedWindow("Result1", cv2.WINDOW_NORMAL)
@@ -304,13 +305,30 @@ class SettingsView():
                     )[0]
                 )
                 show_images.append(handler.run())
-            # else:
-            #     show_images.append(image)
+            else:
+                show_images.append(image)
 
-        # for image_index, image in enumerate(show_images):
-        #     cv2.imshow(str(image_index), image)
+        print(len(show_images))
 
-        # cv2.waitKey()
+        json_settings = None
+
+        try:
+            with open('settings.json', 'r') as file:
+                json_settings = file.read()
+        except FileNotFoundError:
+            print("File Not Found")
+
+        settings = json.loads(json_settings) if json_settings else None
+        monitor = get_monitors()[0]
+        window = Viewer(
+            images=show_images,
+            padding_height=50,
+            window_name="PDF Viewer",
+            window_dim=[monitor.height - 250, monitor.width - 100],
+            settings=settings
+        )
+
+        cv2.waitKey()
 
     def save(self):
         with open("run_settings.json", "w") as file:
